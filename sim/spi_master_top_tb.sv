@@ -53,6 +53,8 @@ module spi_master_tb;
         end
     end
 
+    logic [7 : 0] mosi_bus;
+    logic [7 : 0] miso_bus;
     // Stimulus
     initial begin
         $display("Starting simulation");
@@ -64,6 +66,8 @@ module spi_master_tb;
         spi_clock_divider = 'b0;
         data_in = 'b0;
         spi_miso = 1'b0;
+        mosi_bus <= 'b0;
+        miso_bus <= 'b01101001;
         @(posedge clock);
         @(posedge clock);
         reset = 1'b1;
@@ -71,14 +75,69 @@ module spi_master_tb;
         @(posedge clock);
         reset = 1'b0;
         @(posedge clock);
-        data_in = 'b10101010;
+        data_in = 'b10010110;
         clock_polarity = 1'b1;
         clock_phase = 1'b1;
-        spi_clock_divider = 10;
+        spi_clock_divider = 15;
         enable = 1'b1;
         @(posedge clock);
         enable = 1'b0;
-        repeat (20) @(posedge clock);
+        @(negedge spi_cs_n);
+        for (int i = 7; i >= 0; i--) begin
+            @(negedge spi_clock);   // Shift data
+            spi_miso = miso_bus[i];
+            @(posedge spi_clock);   // Sample data
+            mosi_bus[i] = spi_mosi;
+        end
+        @(negedge done);
+        #125;
+        @(posedge clock);
+        clock_polarity = 1'b0;
+        @(posedge clock);
+        enable = 1'b1;
+        @(posedge clock);
+        enable = 1'b0;
+        @(negedge spi_cs_n);
+        for (int i = 7; i >= 0; i--) begin
+            @(posedge spi_clock);   // Shift data
+            spi_miso = miso_bus[i];
+            @(negedge spi_clock);   // Sample data
+            mosi_bus[i] = spi_mosi;
+        end
+        @(negedge done);
+        #125;
+        @(posedge clock);
+        clock_phase = 1'b0;
+        clock_polarity = 1'b1;
+        @(posedge clock);
+        enable = 1'b1;
+        @(posedge clock);
+        enable = 1'b0;
+        @(negedge spi_cs_n);
+        for (int i = 7; i >= 0; i--) begin
+            spi_miso = miso_bus[i];
+            @(negedge spi_clock);   // Sample data
+            mosi_bus[i] = spi_mosi;
+            @(posedge spi_clock);   // Shift data
+        end
+        @(negedge done);
+        #125;
+        @(posedge clock);
+        clock_phase = 1'b0;
+        clock_polarity = 1'b0;
+        @(posedge clock);
+        enable = 1'b1;
+        @(posedge clock);
+        enable = 1'b0;
+        @(negedge spi_cs_n);
+        for (int i = 7; i >= 0; i--) begin
+            spi_miso = miso_bus[i];
+            @(posedge spi_clock);   // Sample data
+            mosi_bus[i] = spi_mosi;
+            @(negedge spi_clock);   // Shift data
+        end
+        @(negedge done);
+        #125;
         $display("Simulation finished");
         $stop();
     end
