@@ -16,28 +16,29 @@ module spi_master_tb;
     logic   [SPI_DATA_WIDTH-1 : 0]          data_in;
     logic   [SPI_DATA_WIDTH-1 : 0]          data_out;
     logic   done;
+    logic   busy;
     logic   spi_cs_n;
     logic   spi_clock;
     logic   spi_mosi;
     logic   spi_miso;
 
-    spi_master_top
+    spi_master
     # (
         .SPI_CLOCK_DIVIDER_WIDTH    (SPI_CLOCK_DIVIDER_WIDTH),
         .SPI_DATA_WIDTH             (SPI_DATA_WIDTH)
     )
-    spi_master_top_inst
+    spi_master_inst
     (
         .i_clock                (clock),
         .i_reset                (reset),
         .i_enable               (enable),
-        .i_interrupt_enable     (interrupt_enable),
         .i_clock_polarity       (clock_polarity),
         .i_clock_phase          (clock_phase),
         .i_spi_clock_divider    (spi_clock_divider),
         .i_data_in              (data_in),
         .o_data_out             (data_out),
         .o_done                 (done),
+        .o_busy                 (busy),
         .o_spi_cs_n             (spi_cs_n),
         .o_spi_clock            (spi_clock),
         .o_spi_mosi             (spi_mosi),

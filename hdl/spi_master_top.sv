@@ -1,6 +1,6 @@
-module spi_master_top
+module spi_master
     # (
-        parameter SPI_CLOCK_DIVIDER_WIDTH   = 4,
+        parameter SPI_CLOCK_DIVIDER_WIDTH   = 8,
         parameter SPI_DATA_WIDTH            = 8
     )
     (
@@ -9,13 +9,13 @@ module spi_master_top
         input   logic   i_reset,
         // Data, control and status interface
         input   logic                                   i_enable,
-        input   logic                                   i_interrupt_enable,
         input   logic                                   i_clock_polarity,
         input   logic                                   i_clock_phase,
         input   logic [SPI_CLOCK_DIVIDER_WIDTH-1 : 0]   i_spi_clock_divider,
         input   logic [SPI_DATA_WIDTH-1 : 0]            i_data_in,
         output  logic [SPI_DATA_WIDTH-1 : 0]            o_data_out,
         output  logic                                   o_done,
+        output  logic                                   o_busy,
         // SPI interface
         output  logic   o_spi_cs_n,
         output  logic   o_spi_clock,
@@ -94,14 +94,17 @@ module spi_master_top
             spi_mosi <= 1'b0;
             data_out_shift <= 'b0;
             o_data_out <= 'b0;
+            o_busy <= 'b0;
         end else begin
             case (fsm_state)
                 IDLE : begin
                     spi_cs_n <= 'b1;
+                    o_busy <= 'b0;
                     if (i_enable) begin
                         fsm_state <= PRE_DELAY;
                         data_out_shift <= i_data_in;
                         data_in_shift <= 'b0;
+                        o_busy <= 'b1;
                     end
                 end
 
