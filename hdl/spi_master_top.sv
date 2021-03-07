@@ -106,21 +106,41 @@ module spi_master_top # (
         assign o_ld7 = sw7;
     // Debouncer Core - End
 
-
-    // SPI Core - Begin
-        (* keep = "dont_touch" *) logic                                   enable;
+    // SPI Driver <-> SPI Core connecting signals - Begin
+        (* keep = "dont_touch" *) logic                                   spi_enable;
         (* keep = "dont_touch" *) logic                                   clock_polarity;
         (* keep = "dont_touch" *) logic                                   clock_phase;
         (* keep = "dont_touch" *) logic [SPI_CLOCK_DIVIDER_WIDTH-1 : 0]   spi_clock_divider;
-        (* keep = "dont_touch" *) logic [SPI_DATA_WIDTH-1 : 0]            data_in;
-        (* keep = "dont_touch" *) logic [SPI_DATA_WIDTH-1 : 0]            data_out;
-        (* keep = "dont_touch" *) logic                                   done;
-        (* keep = "dont_touch" *) logic                                   busy;
+        (* keep = "dont_touch" *) logic [SPI_DATA_WIDTH-1 : 0]            spi_data_in;
+        (* keep = "dont_touch" *) logic [SPI_DATA_WIDTH-1 : 0]            spi_data_out;
+        (* keep = "dont_touch" *) logic                                   spi_done;
+        (* keep = "dont_touch" *) logic                                   spi_busy;
         (* keep = "dont_touch" *) logic                                   spi_cs_n;
         (* keep = "dont_touch" *) logic                                   spi_clock;
         (* keep = "dont_touch" *) logic                                   spi_mosi;
         (* keep = "dont_touch" *) logic                                   spi_miso;
+    // SPI Driver <-> SPI Core connecting signals - End
 
+    // SPI Driver - Begin
+        spi_driver # (
+            .SPI_DATA_WIDTH (SPI_DATA_WIDTH) 
+        )
+        spi_driver_inst (
+            // Clock, reset
+            .i_clock    (i_clock),
+            .i_reset    (1'b0),
+            // Control
+            .i_enable   (btnu),
+            // SPI Master Control
+            .i_data     (spi_data_out),
+            .i_done     (spi_done),
+            .i_busy     (spi_busy),
+            .o_enable   (spi_enable),
+            .o_data     (spi_data_in)
+        );
+    // SPI Driver - End
+
+    // SPI Core - Begin
         spi_master # (
             .SPI_CLOCK_DIVIDER_WIDTH    (SPI_CLOCK_DIVIDER_WIDTH),   
             .SPI_DATA_WIDTH             (SPI_DATA_WIDTH)  
@@ -130,14 +150,14 @@ module spi_master_top # (
             .i_clock                (i_clock),
             .i_reset                (1'b0),
             // Data, control and status interface
-            .i_enable               (enable),
+            .i_enable               (spi_enable),
             .i_clock_polarity       (clock_polarity),
             .i_clock_phase          (clock_phase),
             .i_spi_clock_divider    (spi_clock_divider),
-            .i_data_in              (data_in),
-            .o_data_out             (data_out),
-            .o_done                 (done),
-            .o_busy                 (busy),
+            .i_data_in              (spi_data_in),
+            .o_data_out             (spi_data_out),
+            .o_done                 (spi_done),
+            .o_busy                 (spi_busy),
             // SPI interface
             .o_spi_cs_n             (spi_cs_n),
             .o_spi_clock            (spi_clock),
@@ -145,11 +165,12 @@ module spi_master_top # (
             .i_spi_miso             (spi_miso)
         );
 
-        assign enable = btnu;
         assign clock_polarity = sw1;
         assign clock_phase = sw2;
         assign spi_clock_divider = {sw7, sw6, sw5, sw4, sw3};
-        assign data_in = 8'h5D;
+        assign spi_cs_n = o_spi_cs_n;
+        assign spi_clock = o_spi_clock;
+        assign spi_mosi = o_spi_mosi;
         assign spi_miso = i_spi_miso;
     // SPI Core - End
 
