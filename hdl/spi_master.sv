@@ -79,6 +79,9 @@ module spi_master
     end
 
     // Main FSM
+    logic enable_delay1;
+    logic enable_delay2;
+    logic enable_rising;
     logic spi_cs_n;
     logic [SPI_DATA_WIDTH-1 : 0] data_out_shift;
     logic [SPI_DATA_WIDTH-1 : 0] data_in_shift;
@@ -96,11 +99,19 @@ module spi_master
             o_data_out <= 'b0;
             o_busy <= 'b0;
         end else begin
+            // Detecting the rising edge of the 'i_enable' signal - BEGIN
+                enable_delay1 <= i_enable;
+                enable_delay2 <= enable_delay1;
+                enable_rising <= 1'b0;
+                if ((enable_delay2 == 1'b0) && (enable_delay1 == 1'b1)) begin
+                    enable_rising <= 1'b1;
+                end
+            // Detecting the rising edge of the 'i_enable' signal - END
             case (fsm_state)
                 IDLE : begin
                     spi_cs_n <= 'b1;
                     o_busy <= 'b0;
-                    if (i_enable) begin
+                    if (enable_rising) begin
                         fsm_state <= PRE_DELAY;
                         data_out_shift <= i_data_in;
                         data_in_shift <= 'b0;
