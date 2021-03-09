@@ -209,6 +209,10 @@ module spi_master
                         fsm_state <= IDLE;
                     end
                 end
+
+                default : begin
+                    fsm_state <= IDLE;
+                end
             endcase
         end
     end

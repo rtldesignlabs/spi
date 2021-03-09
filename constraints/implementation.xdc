@@ -1,8 +1,8 @@
-# Input clock
+# Input Clock
 set_property PACKAGE_PIN Y9 [get_ports i_clock]
 set_property IOSTANDARD LVCMOS33 [get_ports i_clock]
 
-# Input switches
+# Input Switches
 set_property PACKAGE_PIN F22 [get_ports i_sw0]
 set_property IOSTANDARD LVCMOS33 [get_ports i_sw0]
 set_property PACKAGE_PIN G22 [get_ports i_sw1]
@@ -20,7 +20,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports i_sw6]
 set_property PACKAGE_PIN M15 [get_ports i_sw7]
 set_property IOSTANDARD LVCMOS33 [get_ports i_sw7]
 
-# Input buttons
+# Input Buttons
 set_property PACKAGE_PIN P16 [get_ports i_btnc]
 set_property IOSTANDARD LVCMOS33 [get_ports i_btnc]
 set_property PACKAGE_PIN R16 [get_ports i_btnd]
@@ -50,7 +50,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports o_ld6]
 set_property PACKAGE_PIN U14 [get_ports o_ld7]
 set_property IOSTANDARD LVCMOS33 [get_ports o_ld7]
 
-# SPI IO Ports 
+# SPI
 set_property PACKAGE_PIN AB4 [get_ports o_spi_clock]
 set_property IOSTANDARD LVCMOS33 [get_ports o_spi_clock]
 set_property PACKAGE_PIN AB1 [get_ports o_spi_cs_n]
@@ -59,3 +59,7 @@ set_property PACKAGE_PIN Y5 [get_ports o_spi_mosi]
 set_property IOSTANDARD LVCMOS33 [get_ports o_spi_mosi]
 set_property PACKAGE_PIN AB5 [get_ports i_spi_miso]
 set_property IOSTANDARD LVCMOS33 [get_ports i_spi_miso]
+
+# Audio Codec
+set_property PACKAGE_PIN AB2 [get_ports o_codec_mclock]
+set_property IOSTANDARD LVCMOS33 [get_ports o_codec_mclock]

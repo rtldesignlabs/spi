@@ -34,10 +34,12 @@ module spi_driver # (
 
     // Main FSM - Begin
        
-        enum logic [1:0]    {IDLE,
+        enum logic [2:0]    {IDLE,
                             DUMMY_WRITE_1,
                             DUMMY_WRITE_2,
-                            DUMMY_WRITE_3} fsm_state = IDLE;
+                            DUMMY_WRITE_3,
+                            WRITE_CLOCK_CONTROL_REG,
+                            READ_CLOCK_CONTROL_REG} fsm_state = IDLE;
 
         always_ff @(posedge i_clock) begin
             case (fsm_state)
@@ -69,8 +71,30 @@ module spi_driver # (
                     o_enable <= 1'b1;
                     if (i_done == 1'b1) begin
                         o_enable <= 1'b0;
+                        fsm_state <= WRITE_CLOCK_CONTROL_REG;
+                    end
+                end
+
+                WRITE_CLOCK_CONTROL_REG : begin
+                    o_enable <= 1'b1;
+                    o_data <= 32'h0040C307;
+                    if (i_done == 1'b1) begin
+                        o_enable <= 1'b0;
+                        fsm_state <= READ_CLOCK_CONTROL_REG;
+                    end
+                end
+
+                READ_CLOCK_CONTROL_REG : begin
+                    o_enable <= 1'b1;
+                    o_data <= 32'h0140C3;
+                    if (i_done == 1'b1) begin
+                        o_enable <= 1'b0;
                         fsm_state <= IDLE;
                     end
+                end
+
+                default : begin
+                    fsm_state <= IDLE;
                 end
             endcase
         end

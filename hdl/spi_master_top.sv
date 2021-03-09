@@ -1,6 +1,6 @@
 module spi_master_top # (
     parameter SPI_CLOCK_DIVIDER_WIDTH   = 5,
-    parameter SPI_DATA_WIDTH            = 8
+    parameter SPI_DATA_WIDTH            = 32
     ) (
         // Clock
         input   logic i_clock,      // 100 MHz
@@ -32,7 +32,9 @@ module spi_master_top # (
         output  logic   o_spi_cs_n,
         output  logic   o_spi_clock,
         output  logic   o_spi_mosi,
-        input   logic   i_spi_miso
+        input   logic   i_spi_miso,
+        // Audio Codec
+        output  logic   o_codec_mclock
     );
 
     timeunit 1ns;
@@ -173,5 +175,18 @@ module spi_master_top # (
         assign spi_mosi = o_spi_mosi;
         assign spi_miso = i_spi_miso;
     // SPI Core - End
+
+    // Clock Generator for the Audio Codec - Begin
+        logic clock_45;     // 44.1 KHz * 1024 = 45.169664 MHz, core generates 45.16765 MHz
+        clk_wiz_0 clk_wiz_0_inst (
+            .clk_in1    (i_clock),
+            .clk_out1   (clock_45)
+        );
+
+        oddr_0 oddr_0_inst (
+            .clk_in     (clock_45),
+            .clk_out    (o_codec_mclock)
+        );
+    // Clock Generator for the Audio Codec - End
 
 endmodule
