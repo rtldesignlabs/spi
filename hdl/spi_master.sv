@@ -129,7 +129,7 @@ module spi_master
                 SETUP : begin
                     if (~i_clock_phase) begin
                         spi_data_counter <= spi_data_counter + 1;
-                        spi_mosi <= data_out_shift[7];
+                        spi_mosi <= data_out_shift[$size(data_out_shift)-1];
                         data_out_shift <= data_out_shift << 1;
                     end
                     fsm_state <= TRANSMISSION;
@@ -138,56 +138,56 @@ module spi_master
                 TRANSMISSION : begin
                     if (i_clock_phase && i_clock_polarity) begin
                         if (spi_clock_rising == 'b1) begin      // Capture MISO data
-                            data_in_shift <= {data_in_shift[6:0], i_spi_miso};
+                            data_in_shift <= {data_in_shift[$size(data_in_shift)-2:0], i_spi_miso};
                         end
                         if (spi_clock_falling == 'b1) begin
                             spi_data_counter <= spi_data_counter + 1;
-                            spi_mosi <= data_out_shift[7];
+                            spi_mosi <= data_out_shift[$size(data_out_shift)-1];
                             data_out_shift <= data_out_shift << 1;
                         end
-                        if ((spi_data_counter == 8) && (clock_counter == (i_spi_clock_divider-1)) && (spi_clock)) begin
+                        if ((spi_data_counter == SPI_DATA_WIDTH) && (clock_counter == (i_spi_clock_divider-1)) && (spi_clock)) begin
                             spi_data_counter <= 'b0;
                             fsm_state <= POST_DELAY;
                         end
                     end
                     if (i_clock_phase && (~i_clock_polarity)) begin
                         if (spi_clock_falling == 'b1) begin      // Capture MISO data
-                            data_in_shift <= {data_in_shift[6:0], i_spi_miso};
+                            data_in_shift <= {data_in_shift[($size(data_in_shift)-1):0], i_spi_miso};
                         end
                         if (spi_clock_rising == 'b1) begin
                             spi_data_counter <= spi_data_counter + 1;
-                            spi_mosi <= data_out_shift[7];
+                            spi_mosi <= data_out_shift[$size(data_out_shift)-1];
                             data_out_shift <= data_out_shift << 1;
                         end
-                        if ((spi_data_counter == 8) && (clock_counter == (i_spi_clock_divider-1)) && (~spi_clock)) begin
+                        if ((spi_data_counter == SPI_DATA_WIDTH) && (clock_counter == (i_spi_clock_divider-1)) && (~spi_clock)) begin
                             spi_data_counter <= 'b0;
                             fsm_state <= POST_DELAY;
                         end
                     end
                     if ((~i_clock_phase) && i_clock_polarity) begin
                         if (spi_clock_falling == 'b1) begin      // Capture MISO data
-                            data_in_shift <= {data_in_shift[6:0], i_spi_miso};
+                            data_in_shift <= {data_in_shift[($size(data_out_shift)-2):0], i_spi_miso};
                         end
                         if (spi_clock_rising == 'b1) begin
                             spi_data_counter <= spi_data_counter + 1;
-                            spi_mosi <= data_out_shift[7];
+                            spi_mosi <= data_out_shift[$size(data_out_shift)-1];
                             data_out_shift <= data_out_shift << 1;
                         end
-                        if ((spi_data_counter == 8) && (spi_clock_rising)) begin
+                        if ((spi_data_counter == SPI_DATA_WIDTH) && (spi_clock_rising)) begin
                             spi_data_counter <= 'b0;
                             fsm_state <= POST_DELAY;
                         end
                     end
                     if ((~i_clock_phase) && (~i_clock_polarity)) begin
                         if (spi_clock_rising == 'b1) begin      // Capture MISO data
-                            data_in_shift <= {data_in_shift[6:0], i_spi_miso};
+                            data_in_shift <= {data_in_shift[($size(data_in_shift)-1):0], i_spi_miso};
                         end
                         if (spi_clock_falling == 'b1) begin
                             spi_data_counter <= spi_data_counter + 1;
-                            spi_mosi <= data_out_shift[7];
+                            spi_mosi <= data_out_shift[$size(data_out_shift)-1];
                             data_out_shift <= data_out_shift << 1;
                         end
-                        if ((spi_data_counter == 8) && (spi_clock_falling)) begin
+                        if ((spi_data_counter == SPI_DATA_WIDTH) && (spi_clock_falling)) begin
                             spi_data_counter <= 'b0;
                             fsm_state <= POST_DELAY;
                         end

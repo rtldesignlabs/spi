@@ -29,12 +29,16 @@ module spi_master_top # (
         output  logic o_ld6,
         output  logic o_ld7,
         // SPI Interface
-        output  logic   o_spi_cs_n,
-        output  logic   o_spi_clock,
-        output  logic   o_spi_mosi,
-        input   logic   i_spi_miso,
+        output  logic o_spi_cs_n,
+        output  logic o_spi_clock,
+        output  logic o_spi_mosi,
+        input   logic i_spi_miso,
         // Audio Codec
-        output  logic   o_codec_mclock
+        input   logic i_codec_bit_clock,  
+        input   logic i_codec_lr_clock,  
+        input   logic i_codec_adc_data,
+        output  logic o_codec_mclock,
+        output  logic o_codec_dac_data
     );
 
     timeunit 1ns;
@@ -109,19 +113,23 @@ module spi_master_top # (
     // Debouncer Core - End
 
     // SPI Driver <-> SPI Core connecting signals - Begin
-        (* keep = "dont_touch" *) logic                                   spi_enable;
-        (* keep = "dont_touch" *) logic                                   clock_polarity;
-        (* keep = "dont_touch" *) logic                                   clock_phase;
-        (* keep = "dont_touch" *) logic [SPI_CLOCK_DIVIDER_WIDTH-1 : 0]   spi_clock_divider;
-        (* keep = "dont_touch" *) logic [SPI_DATA_WIDTH-1 : 0]            spi_data_in;
-        (* keep = "dont_touch" *) logic [SPI_DATA_WIDTH-1 : 0]            spi_data_out;
-        (* keep = "dont_touch" *) logic                                   spi_done;
-        (* keep = "dont_touch" *) logic                                   spi_busy;
-        (* keep = "dont_touch" *) logic                                   spi_cs_n;
-        (* keep = "dont_touch" *) logic                                   spi_clock;
-        (* keep = "dont_touch" *) logic                                   spi_mosi;
-        (* keep = "dont_touch" *) logic                                   spi_miso;
+        logic                                   spi_enable;
+        logic                                   clock_polarity;
+        logic                                   clock_phase;
+        logic [SPI_CLOCK_DIVIDER_WIDTH-1 : 0]   spi_clock_divider;
+        logic [SPI_DATA_WIDTH-1 : 0]            spi_data_in;
+        logic [SPI_DATA_WIDTH-1 : 0]            spi_data_out;
+        logic                                   spi_done;
+        logic                                   spi_busy;
+        logic                                   spi_cs_n;
+        logic                                   spi_clock;
+        logic                                   spi_mosi;
+        logic                                   spi_miso;
     // SPI Driver <-> SPI Core connecting signals - End
+
+    // Audio data loopback - Begin
+        assign o_codec_dac_data = i_codec_adc_data;
+    // Audio data loopback - End
 
     // SPI Driver - Begin
         spi_driver # (
