@@ -47,6 +47,8 @@ module spi_driver # (
                             PLAYBACK_RIGHT_MIXER_UNMUTE_ENABLE,
                             HEADPHONE_OUTPUT_LEFT_ENABLE,
                             HEADPHONE_OUTPUT_RIGHT_ENABLE,
+                            PLAYBACK_RIGHT_MIXER_LINE_OUT_ENABLE,
+                            PLAYBACK_LEFT_MIXER_LINE_OUT_ENABLE,
                             LINE_OUT_LEFT_ENABLE,
                             LINE_OUT_RIGHT_ENABLE,
                             ADCS_ENABLE,
@@ -165,7 +167,7 @@ module spi_driver # (
 
                 HEADPHONE_OUTPUT_LEFT_ENABLE : begin
                     o_enable <= 1'b1;
-                    o_data <= 32'h004023E7;
+                    o_data <= 32'h004023E6;
                     if (i_done == 1'b1) begin
                         o_enable <= 1'b0;
                         fsm_state <= HEADPHONE_OUTPUT_RIGHT_ENABLE;
@@ -174,7 +176,25 @@ module spi_driver # (
 
                 HEADPHONE_OUTPUT_RIGHT_ENABLE : begin
                     o_enable <= 1'b1;
-                    o_data <= 32'h004024E7;
+                    o_data <= 32'h004024E6;
+                    if (i_done == 1'b1) begin
+                        o_enable <= 1'b0;
+                        fsm_state <= PLAYBACK_RIGHT_MIXER_LINE_OUT_ENABLE;
+                    end
+                end
+
+                PLAYBACK_RIGHT_MIXER_LINE_OUT_ENABLE : begin
+                    o_enable <= 1'b1;
+                    o_data <= 32'h00402109;
+                    if (i_done == 1'b1) begin
+                        o_enable <= 1'b0;
+                        fsm_state <= PLAYBACK_LEFT_MIXER_LINE_OUT_ENABLE;
+                    end
+                end
+
+                PLAYBACK_LEFT_MIXER_LINE_OUT_ENABLE : begin
+                    o_enable <= 1'b1;
+                    o_data <= 32'h00402003;
                     if (i_done == 1'b1) begin
                         o_enable <= 1'b0;
                         fsm_state <= LINE_OUT_LEFT_ENABLE;
@@ -183,7 +203,7 @@ module spi_driver # (
 
                 LINE_OUT_LEFT_ENABLE : begin
                     o_enable <= 1'b1;
-                    o_data <= 32'h004025E7;
+                    o_data <= 32'h004025E6;
                     if (i_done == 1'b1) begin
                         o_enable <= 1'b0;
                         fsm_state <= LINE_OUT_RIGHT_ENABLE;
@@ -192,7 +212,7 @@ module spi_driver # (
 
                 LINE_OUT_RIGHT_ENABLE : begin
                     o_enable <= 1'b1;
-                    o_data <= 32'h004026E7;
+                    o_data <= 32'h004026E6;
                     if (i_done == 1'b1) begin
                         o_enable <= 1'b0;
                         fsm_state <= ADCS_ENABLE;
