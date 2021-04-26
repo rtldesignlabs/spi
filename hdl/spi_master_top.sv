@@ -68,8 +68,8 @@ module spi_master_top # (
             // Clock
             .i_clock                    (i_clock),
             // Debounce counter values
-            .i_switch_debounce_counter  (16'd1000),
-            .i_button_debounce_counter  (16'd1000),
+            .i_switch_debounce_counter  (16'd10000),
+            .i_button_debounce_counter  (16'd10000),
             // Input switches
             .i_sw0                      (i_sw0),
             .i_sw1                      (i_sw1),
@@ -102,36 +102,25 @@ module spi_master_top # (
             .o_btnc                     (btnc)
         );
 
-        assign o_ld0 = (sw0 | btnu | btnd | btnl | btnr | btnc);    // LD0 can be activated by SW0 or any of the pushbuttons
-        assign o_ld1 = sw1;
-        assign o_ld2 = sw2;
-        assign o_ld3 = sw3;
-        assign o_ld4 = sw4;
-        assign o_ld5 = sw5;
-        assign o_ld6 = sw6;
-        assign o_ld7 = sw7;
-    // Debouncer Core - End
+    // LD0 assignment, can be activated by SW0 or any of the pushbuttons
+        led_share led_share_inst (
+            .i_sw0  (sw0),
+            .i_btnu (btnu),
+            .i_btnd (btnd),
+            .i_btnl (btnl),
+            .i_btnr (btnr),
+            .i_btnc (btnc),
+            .o_ld0  (o_ld0)
+        );
 
-    // SPI Driver <-> SPI Core connecting signals - Begin
-        logic                                   spi_enable;
-        logic                                   clock_polarity;
-        logic                                   clock_phase;
-        logic [SPI_CLOCK_DIVIDER_WIDTH-1 : 0]   spi_clock_divider;
-        logic [SPI_DATA_WIDTH-1 : 0]            spi_data_in;
-        logic [SPI_DATA_WIDTH-1 : 0]            spi_data_out;
-        logic                                   spi_done;
-        logic                                   spi_busy;
-        logic                                   spi_cs_n;
-        logic                                   spi_clock;
-        logic                                   spi_mosi;
-        logic                                   spi_miso;
-    // SPI Driver <-> SPI Core connecting signals - End
+    // SPI Driver <-> SPI Core connecting signals
+        logic                           spi_enable;
+        logic [SPI_DATA_WIDTH-1 : 0]    spi_data_in;
+        logic [SPI_DATA_WIDTH-1 : 0]    spi_data_out;
+        logic                           spi_done;
+        logic                           spi_busy;
 
-    // Audio data loopback - Begin
-        assign o_codec_dac_data = i_codec_adc_data;
-    // Audio data loopback - End
-
-    // SPI Driver - Begin
+    // SPI Driver
         spi_driver # (
             .SPI_DATA_WIDTH (SPI_DATA_WIDTH) 
         )
@@ -148,9 +137,8 @@ module spi_master_top # (
             .o_enable   (spi_enable),
             .o_data     (spi_data_in)
         );
-    // SPI Driver - End
 
-    // SPI Core - Begin
+    // SPI Core
         spi_master # (
             .SPI_CLOCK_DIVIDER_WIDTH    (SPI_CLOCK_DIVIDER_WIDTH),   
             .SPI_DATA_WIDTH             (SPI_DATA_WIDTH)  
@@ -161,28 +149,19 @@ module spi_master_top # (
             .i_reset                (1'b0),
             // Data, control and status interface
             .i_enable               (spi_enable),
-            .i_clock_polarity       (clock_polarity),
-            .i_clock_phase          (clock_phase),
-            .i_spi_clock_divider    (spi_clock_divider),
+            .i_clock_polarity       (1'b0),
+            .i_clock_phase          (1'b0),
+            .i_spi_clock_divider    (5'b10000),
             .i_data_in              (spi_data_in),
             .o_data_out             (spi_data_out),
             .o_done                 (spi_done),
             .o_busy                 (spi_busy),
             // SPI interface
-            .o_spi_cs_n             (spi_cs_n),
-            .o_spi_clock            (spi_clock),
-            .o_spi_mosi             (spi_mosi),
-            .i_spi_miso             (spi_miso)
+            .o_spi_cs_n             (o_spi_cs_n),
+            .o_spi_clock            (o_spi_clock),
+            .o_spi_mosi             (o_spi_mosi),
+            .i_spi_miso             (i_spi_miso)
         );
-
-        assign clock_polarity = sw1;
-        assign clock_phase = sw2;
-        assign spi_clock_divider = {sw7, sw6, sw5, sw4, sw3};
-        assign spi_cs_n = o_spi_cs_n;
-        assign spi_clock = o_spi_clock;
-        assign spi_mosi = o_spi_mosi;
-        assign spi_miso = i_spi_miso;
-    // SPI Core - End
 
     // Clock Generator for the Audio Codec - Begin
         logic clock_45;     // 44.1 KHz * 1024 = 45.169664 MHz, core generates 45.16765 MHz
@@ -195,6 +174,17 @@ module spi_master_top # (
             .clk_in     (clock_45),
             .clk_out    (o_codec_mclock)
         );
-    // Clock Generator for the Audio Codec - End
+
+    // Audio Processor
+        audio_processor audio_processor_inst ( 
+            .i_clock            (i_clock),
+            // Audio Interface
+            .i_codec_bit_clock  (i_codec_bit_clock),  
+            .i_codec_lr_clock   (i_codec_lr_clock),  
+            .i_codec_adc_data   (i_codec_adc_data),
+            .o_codec_dac_data   (o_codec_dac_data),
+            // Output LEDs
+            .o_leds             ({o_ld7, o_ld6, o_ld5, o_ld4, o_ld3, o_ld2, o_ld1})
+        );
 
 endmodule
