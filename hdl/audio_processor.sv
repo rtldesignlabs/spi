@@ -4,18 +4,19 @@ module audio_processor (
     input   logic           i_codec_bit_clock,
     input   logic           i_codec_lr_clock,
     input   logic           i_codec_adc_data,
-    output  logic           o_codec_dac_data,
-    // Output LEDs
-    output  logic [6 : 0]   o_leds
+    output  logic           o_codec_dac_data
 );
 
     timeunit 1ns;
     timeprecision 1ps;
 
-    // Audio Deserializer Output Signals
-    logic [23 : 0] data_right;
-    logic [23 : 0] data_left;
-    logic          data_valid;
+    // Connecting signals
+        logic [23 : 0]  data_right_1;
+        logic [23 : 0]  data_right_2;
+        logic [23 : 0]  data_left_1;
+        logic [23 : 0]  data_left_2;
+        logic           data_valid_1;
+        logic           data_valid_2;
 
     // Audio Deserializer
     audio_deserializer audio_deserializer_inst (
@@ -25,9 +26,22 @@ module audio_processor (
         .i_codec_lr_clock   (i_codec_lr_clock),
         .i_codec_adc_data   (i_codec_adc_data),
         // Parallel Data Output
-        .o_data_left        (data_left),
-        .o_data_right       (data_right),
-        .o_data_valid       (data_valid)
+        .o_data_left        (data_left_1),
+        .o_data_right       (data_right_1),
+        .o_data_valid       (data_valid_1)
+    );
+
+    // Monitor Controller
+    monitor_controller monitor_controller_inst ( 
+        .i_clock        (i_clock),
+        // Audio Data Input
+        .i_data_left    (data_left_1),
+        .i_data_right   (data_right_1),
+        .i_data_valid   (data_valid_1),
+        // Audio Data Output
+        .o_data_left    (data_left_2),
+        .o_data_right   (data_right_2),
+        .o_data_valid   (data_valid_2)
     );
 
     // Audio Serializer
@@ -38,20 +52,9 @@ module audio_processor (
         .i_codec_lr_clock   (i_codec_lr_clock),
         .o_codec_dac_data   (o_codec_dac_data),
         // Parallel Data Output
-        .i_data_left        (data_left),
-        .i_data_right       (data_right),
-        .i_data_valid       (data_valid)
-    );
-
-    // LED Meter
-    led_meter (
-        .i_clock        (i_clock),
-        // Audio Data Input
-        .i_data_left    (data_left),
-        .i_data_right   (data_right),
-        .i_data_valid   (data_valid),
-        // LEDs
-        .o_leds         (o_leds)
+        .i_data_left        (data_left_2),
+        .i_data_right       (data_right_2),
+        .i_data_valid       (data_valid_2)
     );
 
 endmodule

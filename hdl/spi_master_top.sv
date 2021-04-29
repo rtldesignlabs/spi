@@ -44,7 +44,7 @@ module spi_master_top # (
     timeunit 1ns;
     timeprecision 1ps;
 
-    // Debouncer Core - Begin
+    // Debouncer Core
         logic sw0;
         logic sw1;
         logic sw2;
@@ -129,7 +129,7 @@ module spi_master_top # (
             .i_clock    (i_clock),
             .i_reset    (1'b0),
             // Control
-            .i_enable   (btnu),
+            .i_enable   (btnc),
             // SPI Master Control
             .i_data     (spi_data_out),
             .i_done     (spi_done),
@@ -163,7 +163,7 @@ module spi_master_top # (
             .i_spi_miso             (i_spi_miso)
         );
 
-    // Clock Generator for the Audio Codec - Begin
+    // Clock Generator for the Audio Codec
         logic clock_45;     // 44.1 KHz * 1024 = 45.169664 MHz, core generates 45.16765 MHz
         clk_wiz_0 clk_wiz_0_inst (
             .clk_in1    (i_clock),
@@ -182,9 +182,7 @@ module spi_master_top # (
             .i_codec_bit_clock  (i_codec_bit_clock),  
             .i_codec_lr_clock   (i_codec_lr_clock),  
             .i_codec_adc_data   (i_codec_adc_data),
-            .o_codec_dac_data   (o_codec_dac_data),
-            // Output LEDs
-            .o_leds             ({o_ld7, o_ld6, o_ld5, o_ld4, o_ld3, o_ld2, o_ld1})
+            .o_codec_dac_data   (o_codec_dac_data)        
         );
 
 endmodule
