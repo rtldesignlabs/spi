@@ -19,9 +19,9 @@
 # Don't ignore the IP defintion files
 !/ip/*/*.xci
 # Don't ignore the output files
-!/output/*.bit
-!/output/*.hdf
-!/output/*.dcp
+!/output/**/*.bit
+!/output/**/*.xsa
+!/output/**/*.dcp
 # Don't ignore the project files
 !/project/*.xpr
 # Don't ignore the simulation files 
