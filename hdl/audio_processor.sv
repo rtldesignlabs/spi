@@ -1,10 +1,15 @@
 module audio_processor (
-    input   logic           i_clock,
+    input   logic   i_clock,
     // Audio Interface
-    input   logic           i_codec_bit_clock,
-    input   logic           i_codec_lr_clock,
-    input   logic           i_codec_adc_data,
-    output  logic           o_codec_dac_data
+    input   logic   i_codec_bit_clock,
+    input   logic   i_codec_lr_clock,
+    input   logic   i_codec_adc_data,
+    output  logic   o_codec_dac_data,
+    // Buttons
+    input   logic   i_btnu,
+    input   logic   i_btnd,
+    input   logic   i_btnl,
+    input   logic   i_btnr
 );
 
     timeunit 1ns;
@@ -38,6 +43,11 @@ module audio_processor (
         .i_data_left    (data_left_1),
         .i_data_right   (data_right_1),
         .i_data_valid   (data_valid_1),
+        // Buttons
+        .i_btnu         (i_btnu),
+        .i_btnd         (i_btnd),
+        .i_btnl         (i_btnl),
+        .i_btnr         (i_btnr),
         // Audio Data Output
         .o_data_left    (data_left_2),
         .o_data_right   (data_right_2),
