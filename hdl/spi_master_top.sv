@@ -182,16 +182,12 @@ module spi_master_top # (
             .i_codec_bit_clock  (i_codec_bit_clock),  
             .i_codec_lr_clock   (i_codec_lr_clock),  
             .i_codec_adc_data   (i_codec_adc_data),
-<<<<<<< HEAD
             .o_codec_dac_data   (o_codec_dac_data),
             // Buttons
             .i_btnu             (btnu),
             .i_btnd             (btnd),
             .i_btnl             (btnl),
             .i_btnr             (btnr)    
-=======
-            .o_codec_dac_data   (o_codec_dac_data)        
->>>>>>> 9a691bf9e666dc0ea2514ad7430ff93e2f220e5f
         );
 
 endmodule
