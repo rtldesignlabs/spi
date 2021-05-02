@@ -1,6 +1,7 @@
 module audio_processor (
     input   logic   i_clock,
     // Audio Interface
+<<<<<<< HEAD
     input   logic   i_codec_bit_clock,
     input   logic   i_codec_lr_clock,
     input   logic   i_codec_adc_data,
@@ -10,6 +11,12 @@ module audio_processor (
     input   logic   i_btnd,
     input   logic   i_btnl,
     input   logic   i_btnr
+=======
+    input   logic           i_codec_bit_clock,
+    input   logic           i_codec_lr_clock,
+    input   logic           i_codec_adc_data,
+    output  logic           o_codec_dac_data
+>>>>>>> 9a691bf9e666dc0ea2514ad7430ff93e2f220e5f
 );
 
     timeunit 1ns;
